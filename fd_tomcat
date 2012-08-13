@@ -1,0 +1,35 @@
+#!/bin/sh
+# -*- sh -*-
+# 
+# Plugin to monitor the number of open files in the system.
+#
+#
+# Copyright (C) 2012 Steven MARTINS <steven.martins.fr@gmail.com>
+#
+
+. $MUNIN_LIBDIR/plugins/plugin.sh
+
+if [ "$1" = "autoconf" ]; then
+	if [ -x /usr/sbin/lsof ]; then
+		echo yes
+		exit 0
+	else
+		echo "no (no lsof)"
+		exit 0
+	fi
+fi
+
+if [ "$1" = "config" ]; then
+	echo graph_title Tomcat open file
+	echo graph_args --base 1000 -l 0
+	echo graph_vlabel number of files
+	echo graph_category tomcat
+	echo cnt.label fd count
+	echo cnt.warning  900
+	echo cnt.critical 1020
+	exit 0
+fi
+
+echo -n "cnt.value "
+echo `lsof -n -u root|egrep 'java|alfresco|tomc' | wc -l`
+
